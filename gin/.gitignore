@@ -1,0 +1,28 @@
+# Binaries
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Environment variables
+.env
+
+# Build artifacts
+*.out
+*.a
+
+# Caches
+.cache/
+tmp/
+
+# Dependency directories
+vendor/
+
+# Go module files (if using Go modules)
+go.sum
+
+# IDE/editor-specific directories
+.idea/
+.vscode/
+.DS_Store

@@ -1,0 +1,19 @@
+# Lingkungan virtual
+env/
+venv/
+
+# File konfigurasi sensitif
+.env
+
+# Bytecode dan cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# File log
+*.log
+
+# Metadata build dan distribusi
+*.egg-info/
+dist/
+build/
