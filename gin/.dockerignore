@@ -1,0 +1,25 @@
+# Binaries
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Environment variables
+.env
+
+# Build artifacts
+*.out
+*.a
+
+# Caches
+.cache/
+tmp/
+
+# Dependency directories (jika tidak menggunakan vendor)
+vendor/
+
+# IDE/editor-specific directories
+.idea/
+.vscode/
+.DS_Store

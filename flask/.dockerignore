@@ -1,0 +1,27 @@
+# Virtual environment
+env/
+venv/
+
+# 
+.env
+
+# Bytecode dan cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# File log
+*.log
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# Dependency directories
+vendor/
+
+# IDE/editor-specific directories
+.idea/
+.vscode/
+.DS_Store

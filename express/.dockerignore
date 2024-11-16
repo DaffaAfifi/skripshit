@@ -1,8 +1,16 @@
-node_modules
-npm-debug.log
-.DS_Store
+# Folder lingkungan virtual atau dependencies
+node_modules/
+
+# Environment variables
 .env
-.git
-.idea
-.vscode
-test
+
+# Folder build dan output
+dist/
+build/
+
+# File log
+*.log
+
+# Cache atau file sementara
+.DS_Store
+*.env # Mengabaikan .env dari image Docker, hapus baris ini jika ingin menyertakan .env
