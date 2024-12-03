@@ -50,7 +50,7 @@ def update_user(id):
     return update_user_controller(id)
 
 # get news comments by news id
-@router.route('/news/comment/<id>', methods=['GET'])
+@router.route('/news/<id>', methods=['GET'])
 @auth_middleware
 def get_news_comments(id):
     return get_news_comments_controller(id)

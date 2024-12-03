@@ -4,20 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"time"
 
-	_ "github.com/go-sql-driver/mysql" // Import driver MySQL
-	"github.com/joho/godotenv"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var DB *sql.DB
 
 func InitDB() {
-	err := godotenv.Load()
-	if err != nil {
-		panic(err)
-	}
-
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
@@ -26,15 +19,15 @@ func InitDB() {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
 
+	var err error
 	DB, err = sql.Open("mysql", dsn)
 	if err != nil {
 		panic(err)
 	}
 
-	DB.SetMaxOpenConns(25)
-	DB.SetMaxIdleConns(25)
-	DB.SetConnMaxLifetime(5 * time.Minute)
-	DB.SetConnMaxIdleTime(5 * time.Minute)
+	DB.SetMaxOpenConns(50)
+	DB.SetMaxIdleConns(20)
+	DB.SetConnMaxLifetime(0)
 
 	err = DB.Ping()
 	if err != nil {

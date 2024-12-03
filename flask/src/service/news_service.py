@@ -3,6 +3,9 @@ from response.response_error import ResponseError
 
 def get_news_comments(id):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         query = """
             SELECT 
@@ -43,3 +46,6 @@ def get_news_comments(id):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()

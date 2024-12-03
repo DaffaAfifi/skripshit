@@ -5,6 +5,9 @@ from application.database import get_cursor, db_connection
 
 def get_assistance_tools(id):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         query = """
             SELECT 
@@ -50,9 +53,15 @@ def get_assistance_tools(id):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()
     
 def create_assistance_tools(req):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         data = validate(CreateAssistanceToolsValidation, req)
 
@@ -73,3 +82,6 @@ def create_assistance_tools(req):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()

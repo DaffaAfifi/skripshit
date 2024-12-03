@@ -6,6 +6,6 @@ const publicRouter = new express.Router();
 publicRouter.get("/api/test-connection", userController.test);
 
 // Auth API
-publicRouter.post("/api/users/login", authController.login); // Login -> mid
+publicRouter.post("/api/login", authController.login); // Login -> mid
 
 export { publicRouter };

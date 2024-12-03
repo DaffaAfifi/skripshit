@@ -20,6 +20,9 @@ def auth_middleware(f):
             decoded_token = jwt.decode(token, jwt_secret, algorithms=["HS256"])
 
             cursor = get_cursor()
+            if cursor is None:
+                raise ResponseError(500, "Error obtaining database connection")
+            
             query = "SELECT * FROM sessions WHERE token = %s"
             cursor.execute(query, (token,))
             rows = cursor.fetchall()
@@ -33,5 +36,8 @@ def auth_middleware(f):
             raise e
         except Exception as e:
             raise ResponseError(401, str(e))
+        finally:
+            if cursor:
+                cursor.close()
 
     return decorated_function

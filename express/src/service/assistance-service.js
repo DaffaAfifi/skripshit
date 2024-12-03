@@ -6,8 +6,9 @@ import { createAssistanceToolsValidation } from "../validation/assistance-tools-
 import { validate } from "../validation/validation.js";
 
 const getAssistanceById = async (id) => {
+  const connection = await db.promise().getConnection();
   try {
-    const [rows] = await db.promise().query(
+    const [rows] = await connection.query(
       `SELECT 
           assistance.id, assistance.nama, assistance.koordinator, 
           assistance.sumber_anggaran, assistance.total_anggaran, 
@@ -50,18 +51,24 @@ const getAssistanceById = async (id) => {
   } catch (error) {
     logger.error(error);
     throw new ResponseError(500, error.message);
+  } finally {
+    connection.release();
   }
 };
 
 const createAssistanceTools = async (req, res) => {
+  const connection = await db.promise().getConnection();
   try {
     const data = validate(createAssistanceToolsValidation, req);
-    const result = await db
-      .promise()
-      .query("INSERT INTO assistance_tools SET ?", [data]);
+    const result = await connection.query(
+      "INSERT INTO assistance_tools SET ?",
+      [data]
+    );
     return result;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 

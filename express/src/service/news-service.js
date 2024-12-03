@@ -4,8 +4,9 @@ import "dotenv/config";
 import { logger } from "../application/logging.js";
 
 const getNewsCommentsById = async (id) => {
+  const connection = await db.promise().getConnection();
   try {
-    const [rows] = await db.promise().query(
+    const [rows] = await connection.query(
       `SELECT 
           news.id, news.gambar, news.judul, news.subjudul, news.isi, news.created_at, 
           comments.user_id AS user_id, comments.comment, comments.created_at AS comment_created_at
@@ -43,6 +44,8 @@ const getNewsCommentsById = async (id) => {
   } catch (error) {
     logger.error(error);
     throw new ResponseError(500, error.message);
+  } finally {
+    connection.release();
   }
 };
 

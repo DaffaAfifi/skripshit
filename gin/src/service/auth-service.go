@@ -53,14 +53,14 @@ func Login(request model.LoginUserRequest, db *sql.DB) (string, error) {
 		return "", response.NewResponseError(500, err.Error())
 	}
 
-	insertQuery := `INSERT INTO sessions (token, email, expiry, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
+	insertQuery := `INSERT INTO sessions (token, user_id, expiry, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
 	stmtInsert, err := db.Prepare(insertQuery)
 	if err != nil {
 		return "", response.NewResponseError(500, err.Error())
 	}
 	defer stmtInsert.Close()
 
-	_, err = stmtInsert.Exec(tokenString, email, expirationTime, time.Now(), time.Now())
+	_, err = stmtInsert.Exec(tokenString, id, expirationTime, time.Now(), time.Now())
 	if err != nil {
 		return "", response.NewResponseError(500, err.Error())
 	}

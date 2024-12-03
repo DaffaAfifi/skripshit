@@ -9,15 +9,14 @@ import { logger } from "../application/logging.js";
 
 // Login user
 const login = async (req) => {
+  const connection = await db.promise().getConnection();
   try {
     const loginRequest = validate(loginUserValidation, req);
 
-    const [rows] = await db
-      .promise()
-      .query(
-        "SELECT id, email, nama, role_id, password FROM users WHERE email = ?",
-        [loginRequest.email]
-      );
+    const [rows] = await connection.query(
+      "SELECT id, email, nama, role_id, password FROM users WHERE email = ?",
+      [loginRequest.email]
+    );
 
     if (rows.length === 0) {
       throw new ResponseError(400, "Username or password wrong");
@@ -25,10 +24,8 @@ const login = async (req) => {
 
     const user = rows[0];
 
-    const isPasswordValid = await bcrypt.compare(
-      loginRequest.password,
-      user.password
-    );
+    const hash = user.password.replace("$2y$", "$2a$");
+    const isPasswordValid = await bcrypt.compare(loginRequest.password, hash);
 
     if (!isPasswordValid) {
       throw new ResponseError(400, "Username or password wrong");
@@ -40,34 +37,32 @@ const login = async (req) => {
       { expiresIn: "2h" }
     );
 
-    await db
-      .promise()
-      .query(
-        "INSERT INTO sessions (token, email, expiry, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
-        [
-          token,
-          user.email,
-          new Date(Date.now() + 7200000),
-          new Date(),
-          new Date(),
-        ]
-      );
+    await connection.query(
+      "INSERT INTO sessions (token, user_id, expiry, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+      [token, user.id, new Date(Date.now() + 7200000), new Date(), new Date()]
+    );
 
     return token;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 
 // Logout user
 const logout = async (token) => {
+  const connection = await db.promise().getConnection();
   try {
-    const result = await db
-      .promise()
-      .query("DELETE FROM sessions WHERE token = ?", [token]);
+    const result = await connection.query(
+      "DELETE FROM sessions WHERE token = ?",
+      [token]
+    );
     return result;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 

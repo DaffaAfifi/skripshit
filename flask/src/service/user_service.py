@@ -7,15 +7,24 @@ from collections import defaultdict
 
 def get_users():
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         cursor.execute("SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users")
         users = cursor.fetchall()
         return users
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()
     
 def get_user_by_id(id):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+
     try:
         cursor.execute("SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir,jenis_usaha FROM users WHERE id = %s", (id,))
         user = cursor.fetchone()
@@ -28,9 +37,15 @@ def get_user_by_id(id):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()
     
 def create_user(req):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         data = validate(CreateUserValidation, req)
 
@@ -63,9 +78,15 @@ def create_user(req):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()
 
 def get_user_saved_news(id):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         query = """
             SELECT 
@@ -106,9 +127,15 @@ def get_user_saved_news(id):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()
 
 def get_user_saved_news_comments(id):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         query = """
             SELECT 
@@ -160,9 +187,15 @@ def get_user_saved_news_comments(id):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()
     
 def get_user_facilities(id):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         query = """
             SELECT
@@ -253,9 +286,15 @@ def get_user_facilities(id):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()
     
 def update_user(id, req):
     cursor = get_cursor()
+    if cursor is None:
+        raise ResponseError(500, "Error obtaining database connection")
+    
     try:
         data = validate(UpdateUserValidation, req)
         data_dict = data.dict(exclude_unset=True)
@@ -280,3 +319,6 @@ def update_user(id, req):
         raise e
     except Exception as e:
         raise ResponseError(500, str(e))
+    finally:
+        if cursor:
+            cursor.close()

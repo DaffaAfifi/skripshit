@@ -11,27 +11,29 @@ import { logger } from "../application/logging.js";
 
 // Get all users
 const getUsers = async () => {
+  const connection = await db.promise().getConnection();
   try {
-    const [rows] = await db
-      .promise()
-      .query(
-        "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users"
-      );
+    const [rows] = await connection.query(
+      "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users"
+    );
 
     return rows;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 
 // Create user
 const createUser = async (req, res) => {
+  const connection = await db.promise().getConnection();
   try {
     const user = validate(createUserValidation, req);
 
     user.password = await bcrypt.hash(user.password, 10);
 
-    const [result] = await db.promise().query(
+    const [result] = await connection.query(
       `INSERT INTO users (nama, email, password, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha, created_at, updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE email = email`,
@@ -59,18 +61,19 @@ const createUser = async (req, res) => {
     return result;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 
 // Get user by id
 const getUserById = async (id) => {
+  const connection = await db.promise().getConnection();
   try {
-    const [rows] = await db
-      .promise()
-      .query(
-        "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users WHERE id = ?",
-        [id]
-      );
+    const [rows] = await connection.query(
+      "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users WHERE id = ?",
+      [id]
+    );
 
     if (rows.length === 0) {
       throw new ResponseError(404, "User not found");
@@ -79,13 +82,16 @@ const getUserById = async (id) => {
     return rows[0];
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 
 // Get user saved news
 const getSavedNews = async (id) => {
+  const connection = await db.promise().getConnection();
   try {
-    const [rows] = await db.promise().query(
+    const [rows] = await connection.query(
       `SELECT 
           users.id, users.nama, users.email, news.id AS news_id, news.gambar, news.judul, news.subjudul, news.isi, news.created_at 
         FROM users 
@@ -116,13 +122,16 @@ const getSavedNews = async (id) => {
     return payload;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 
 // Get user facilities
 const getFacilities = async (id) => {
+  const connection = await db.promise().getConnection();
   try {
-    const [rows] = await db.promise().query(
+    const [rows] = await connection.query(
       `SELECT
           users.id, users.email, 
           sertificates.id AS id_sertifikat, sertificates.nama AS nama_sertifikat, user_sertificates.no_sertifikat, sertificates.tanggal_terbit, sertificates.kadaluarsa, sertificates.keterangan,
@@ -216,11 +225,14 @@ const getFacilities = async (id) => {
     return result;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 
 // Update user
 const updateUser = async (id, data) => {
+  const connection = await db.promise().getConnection();
   const userUpdates = validate(updateUserValidation, data);
 
   const updates = [];
@@ -239,7 +251,7 @@ const updateUser = async (id, data) => {
   values.push(id);
 
   try {
-    const result = await db.promise().query(query, values);
+    const result = await connection.query(query, values);
 
     if (result.affectedRows === 0) {
       throw new ResponseError(404, "User not found");
@@ -248,13 +260,16 @@ const updateUser = async (id, data) => {
     return result;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 
 // Get saved news comment
 const getSavedNewsComment = async (id) => {
+  const connection = await db.promise().getConnection();
   try {
-    const [rows] = await db.promise().query(
+    const [rows] = await connection.query(
       `SELECT 
           users.id, users.nama, users.email, news.id AS news_id, news.gambar, news.judul, news.subjudul, news.isi, news.created_at, comments.news_id AS comment_id, comments.comment, comments.created_at
         FROM users
@@ -304,6 +319,8 @@ const getSavedNewsComment = async (id) => {
     return result;
   } catch (error) {
     throw new ResponseError(400, error.message);
+  } finally {
+    connection.release();
   }
 };
 
