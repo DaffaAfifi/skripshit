@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetAssistanceTools meng-handle permintaan untuk mendapatkan data alat bantuan berdasarkan ID yang diberikan.
 func GetAssistanceTools(c *gin.Context, db *sql.DB) {
 	id := c.Param("id")
 	assistanceTools, err := service.GetAssistanceTools(id, db)
@@ -25,6 +26,7 @@ func GetAssistanceTools(c *gin.Context, db *sql.DB) {
 	response.Response(200, assistanceTools, "success get assistance tools", c)
 }
 
+// CreateAssistanceTools meng-handle permintaan untuk membuat data alat bantuan baru, setelah melakukan validasi dan pengolahan data yang diberikan.
 func CreateAssistanceTools(c *gin.Context, db *sql.DB) {
 	var request model.CreateAssistanceToolsRequest
 	if err := c.ShouldBindJSON(&request); err != nil {

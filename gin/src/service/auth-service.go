@@ -11,6 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Login melakukan proses autentikasi pengguna berdasarkan email dan password
 func Login(request model.LoginUserRequest, db *sql.DB) (string, error) {
 	var id, role int
 	var hashedPassword, nama, email string
@@ -68,6 +69,7 @@ func Login(request model.LoginUserRequest, db *sql.DB) (string, error) {
 	return tokenString, nil
 }
 
+// Logout menghapus sesi pengguna berdasarkan token yang diberikan
 func Logout(token string, db *sql.DB) error {
 	query := `DELETE FROM sessions WHERE token = ?`
 	stmt, err := db.Prepare(query)

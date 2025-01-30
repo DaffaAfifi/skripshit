@@ -3,6 +3,7 @@ from response.response_error import ResponseError
 
 app = Flask(__name__)
 
+# Error handler untuk menangani exception yang terjadi di aplikasi
 @app.errorhandler(Exception)
 def error_middleware(error):
     if isinstance(error, ResponseError):

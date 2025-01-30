@@ -5,6 +5,7 @@ import { logger } from "../application/logging.js";
 import { createAssistanceToolsValidation } from "../validation/assistance-tools-validation.js";
 import { validate } from "../validation/validation.js";
 
+// Fungsi untuk mengambil data bantuan berdasarkan ID
 const getAssistanceById = async (id) => {
   const connection = await db.promise().getConnection();
   try {
@@ -56,6 +57,7 @@ const getAssistanceById = async (id) => {
   }
 };
 
+// Fungsi untuk membuat alat bantuan baru
 const createAssistanceTools = async (req, res) => {
   const connection = await db.promise().getConnection();
   try {

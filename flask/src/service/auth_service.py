@@ -2,15 +2,17 @@ import bcrypt
 import jwt
 import os
 from datetime import datetime, timedelta
-from application.database import get_cursor,db_connection
+from application.database import get_connection
 from response.response_error import ResponseError
 from validation.user_validation import LoginUserValidation
 from validation.validation import validate
 
+# Fungsi untuk login user, memverifikasi kredensial, dan menghasilkan token
 def login(req):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
+    cursor = connection.cursor(dictionary=True)
     
     try:
         data = validate(LoginUserValidation, req)
@@ -61,7 +63,7 @@ def login(req):
                 datetime.utcnow()
             )
         )
-        db_connection.commit()
+        connection.commit()
 
         return token
     except ResponseError as e:
@@ -71,19 +73,23 @@ def login(req):
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()
     
     
+# Fungsi untuk logout user dengan menghapus sesi token
 def logout(token):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
+    cursor = connection.cursor(dictionary=True)
     
     try:
         cursor.execute(
             "DELETE FROM sessions WHERE token = %s", 
             (token,)
         )
-        db_connection.commit()
+        connection.commit()
 
         return "oke"
     except ResponseError as e:
@@ -93,3 +99,6 @@ def logout(token):
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()
+        

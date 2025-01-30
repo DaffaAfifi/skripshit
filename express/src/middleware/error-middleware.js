@@ -1,5 +1,6 @@
 import { ResponseError } from "../response/response-error.js";
 
+// Middleware untuk menangani error yang terjadi pada aplikasi
 const errorMiddleware = async (err, req, res, next) => {
   if (!err) {
     next();

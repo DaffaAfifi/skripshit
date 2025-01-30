@@ -1,8 +1,8 @@
 import userService from "../service/user-service.js";
 import { response } from "../response/response.js";
-import { logger } from "../application/logging.js";
 import jwt from "jsonwebtoken";
 
+// Controller untuk test, hanya mengembalikan data statis
 const test = async (req, res, next) => {
   try {
     res.status(200).json({
@@ -13,6 +13,7 @@ const test = async (req, res, next) => {
   }
 };
 
+// Controller untuk memverifikasi token JWT dan mengembalikan decoded data
 const testToken = (req, res, next) => {
   try {
     const token = req.get("Authorization");
@@ -26,15 +27,20 @@ const testToken = (req, res, next) => {
   }
 };
 
+// Controller untuk mendapatkan semua pengguna
 const getUsers = async (req, res, next) => {
   try {
-    const result = await userService.getUsers();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+
+    const result = await userService.getUsers(page, limit);
     response(200, result, "Get users success", res);
   } catch (error) {
     next(error);
   }
 };
 
+// Controller untuk membuat pengguna baru
 const createUser = async (req, res, next) => {
   try {
     const result = await userService.createUser(req.body);
@@ -44,6 +50,7 @@ const createUser = async (req, res, next) => {
   }
 };
 
+// Controller untuk mendapatkan pengguna berdasarkan ID
 const getUserById = async (req, res, next) => {
   try {
     const result = await userService.getUserById(req.params.id);
@@ -53,6 +60,7 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+// Controller untuk mendapatkan berita yang disimpan oleh pengguna
 const getSavedNews = async (req, res, next) => {
   try {
     const result = await userService.getSavedNews(req.params.id);
@@ -62,6 +70,7 @@ const getSavedNews = async (req, res, next) => {
   }
 };
 
+// Controller untuk mendapatkan fasilitas yang dimiliki pengguna
 const getFacilities = async (req, res, next) => {
   try {
     const result = await userService.getFacilities(req.params.id);
@@ -71,6 +80,7 @@ const getFacilities = async (req, res, next) => {
   }
 };
 
+// Controller untuk memperbarui data pengguna berdasarkan ID
 const updateUser = async (req, res, next) => {
   try {
     const result = await userService.updateUser(req.params.id, req.body);
@@ -80,6 +90,7 @@ const updateUser = async (req, res, next) => {
   }
 };
 
+// Controller untuk mendapatkan komentar berita yang disimpan oleh pengguna
 const getSavedNewsComment = async (req, res, next) => {
   try {
     const result = await userService.getSavedNewsComment(req.params.id);

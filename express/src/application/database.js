@@ -1,6 +1,7 @@
 import "dotenv/config";
 import mysql from "mysql2";
 
+// Membuat pool koneksi database dengan konfigurasi dari file .env
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -12,4 +13,5 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+// Mengekspor pool agar dapat digunakan di file lain
 export default pool;

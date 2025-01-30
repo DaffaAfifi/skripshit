@@ -7,6 +7,7 @@ load_dotenv()
 
 POOL_SIZE = 32
 
+# Fungsi untuk membuat pool koneksi MySQL
 def create_pool():
     try:
         pool = pooling.MySQLConnectionPool(
@@ -24,9 +25,19 @@ def create_pool():
         print(f"Error creating connection pool: {err}")
         return None
 
+# Membuat pool koneksi dan menyimpannya ke variabel db_pool
 db_pool = create_pool()
 
-db_connection = db_pool.get_connection()
-
-def get_cursor():
-    return db_connection.cursor(dictionary=True)
+# Fungsi untuk mendapatkan koneksi baru dari pool
+def get_connection():
+    try:
+        if db_pool is None:
+            raise Exception("Connection pool not initialized")
+        connection = db_pool.get_connection()
+        if connection.is_connected():
+            return connection
+        else:
+            raise Exception("Connection is not valid")
+    except Exception as e:
+        print(f"Error getting connection from pool: {e}")
+        return None

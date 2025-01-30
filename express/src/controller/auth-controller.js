@@ -1,6 +1,7 @@
 import authService from "../service/auth-service.js";
 import { response } from "../response/response.js";
 
+// Controller untuk login user
 const login = async (req, res, next) => {
   try {
     const result = await authService.login(req.body);
@@ -10,6 +11,7 @@ const login = async (req, res, next) => {
   }
 };
 
+// Controller untuk logout user
 const logout = async (req, res, next) => {
   try {
     const token = req.get("Authorization");

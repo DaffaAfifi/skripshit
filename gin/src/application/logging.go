@@ -7,6 +7,7 @@ import (
 
 var Logger *zap.Logger
 
+// InitLogger menginisialisasi logger dengan konfigurasi tertentu
 func InitLogger() {
 	config := zap.Config{
 		Level:       zap.NewAtomicLevelAt(zapcore.InfoLevel),
@@ -29,6 +30,7 @@ func InitLogger() {
 	}
 }
 
+// SyncLogger melakukan sinkronisasi dan memastikan log dibersihkan dengan baik
 func SyncLogger() {
 	defer Logger.Sync()
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Login meng-handle permintaan login pengguna, memvalidasi data login, dan mengembalikan token jika login berhasil.
 func Login(c *gin.Context, db *sql.DB) {
 	var request model.LoginUserRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -39,6 +40,7 @@ func Login(c *gin.Context, db *sql.DB) {
 	response.Response(200, gin.H{"token": token}, "success login", c)
 }
 
+// Logout meng-handle permintaan logout pengguna, menghapus token yang digunakan, dan memberikan respons logout yang sukses.
 func Logout(c *gin.Context, db *sql.DB) {
 	token := c.GetHeader("Authorization")
 	err := service.Logout(token, db)

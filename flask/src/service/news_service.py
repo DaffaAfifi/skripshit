@@ -1,11 +1,12 @@
-from application.database import get_cursor
+from application.database import get_connection
 from response.response_error import ResponseError
 
+# Fungsi untuk mendapatkan komentar dari berita berdasarkan ID berita
 def get_news_comments(id):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
-    
+    cursor = connection.cursor(dictionary=True)
     try:
         query = """
             SELECT 
@@ -49,3 +50,5 @@ def get_news_comments(id):
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetNewsComments meng-handle permintaan untuk mendapatkan komentar-komentar pada berita berdasarkan ID berita yang diberikan.
 func GetNewsComments(c *gin.Context, db *sql.DB) {
 	id := c.Param("id")
 	news, err := service.GetNewsComments(id, db)

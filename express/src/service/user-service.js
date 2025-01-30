@@ -7,16 +7,16 @@ import db from "../application/database.js";
 import bcrypt from "bcrypt";
 import { ResponseError } from "../response/response-error.js";
 import "dotenv/config";
-import { logger } from "../application/logging.js";
 
-// Get all users
-const getUsers = async () => {
+// Fungsi untuk mendapatkan semua pengguna dari database
+const getUsers = async (page, limit) => {
   const connection = await db.promise().getConnection();
   try {
+    const offset = (page - 1) * limit;
     const [rows] = await connection.query(
-      "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users"
+      "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users LIMIT ? OFFSET ?",
+      [limit, offset]
     );
-
     return rows;
   } catch (error) {
     throw new ResponseError(400, error.message);
@@ -25,7 +25,7 @@ const getUsers = async () => {
   }
 };
 
-// Create user
+// Fungsi untuk membuat pengguna baru
 const createUser = async (req, res) => {
   const connection = await db.promise().getConnection();
   try {
@@ -66,7 +66,7 @@ const createUser = async (req, res) => {
   }
 };
 
-// Get user by id
+// Fungsi untuk mendapatkan data pengguna berdasarkan ID
 const getUserById = async (id) => {
   const connection = await db.promise().getConnection();
   try {
@@ -87,7 +87,7 @@ const getUserById = async (id) => {
   }
 };
 
-// Get user saved news
+// Fungsi untuk mendapatkan berita yang disimpan oleh pengguna berdasarkan ID
 const getSavedNews = async (id) => {
   const connection = await db.promise().getConnection();
   try {
@@ -127,7 +127,7 @@ const getSavedNews = async (id) => {
   }
 };
 
-// Get user facilities
+// Mendapatkan fasilitas user (sertifikat, pelatihan, bantuan, dan alat)
 const getFacilities = async (id) => {
   const connection = await db.promise().getConnection();
   try {
@@ -230,7 +230,7 @@ const getFacilities = async (id) => {
   }
 };
 
-// Update user
+// Mengupdate data user
 const updateUser = async (id, data) => {
   const connection = await db.promise().getConnection();
   const userUpdates = validate(updateUserValidation, data);
@@ -265,7 +265,7 @@ const updateUser = async (id, data) => {
   }
 };
 
-// Get saved news comment
+// Mendapatkan komentar dari berita yang disimpan oleh user
 const getSavedNewsComment = async (id) => {
   const connection = await db.promise().getConnection();
   try {
@@ -276,8 +276,7 @@ const getSavedNewsComment = async (id) => {
         LEFT JOIN saved_news ON users.id = saved_news.user_id
         LEFT JOIN news ON saved_news.news_id = news.id
         LEFT JOIN comments ON news.id = comments.news_id
-        WHERE users.id = ?
-      `,
+        WHERE users.id = ?`,
       [id]
     );
 

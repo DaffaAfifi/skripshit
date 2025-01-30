@@ -1,17 +1,19 @@
-from application.database import db_connection, get_cursor
+from application.database import get_connection
 from response.response_error import ResponseError
 import bcrypt
 from validation.validation import validate
 from validation.user_validation import CreateUserValidation, UpdateUserValidation
 from collections import defaultdict
 
-def get_users():
-    cursor = get_cursor()
-    if cursor is None:
+# Fungsi untuk mengambil semua data pengguna
+def get_users(page, limit):
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
-    
+    cursor = connection.cursor(dictionary=True)
+    offset = (page - 1) * limit
     try:
-        cursor.execute("SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users")
+        cursor.execute("SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users LIMIT %s OFFSET %s", (limit, offset))
         users = cursor.fetchall()
         return users
     except Exception as e:
@@ -19,14 +21,17 @@ def get_users():
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()
     
+# Fungsi untuk mengambil data pengguna berdasarkan ID
 def get_user_by_id(id):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
-
+    cursor = connection.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir,jenis_usaha FROM users WHERE id = %s", (id,))
+        cursor.execute("SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users WHERE id = %s", (id,))
         user = cursor.fetchone()
 
         if not user:
@@ -40,11 +45,15 @@ def get_user_by_id(id):
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()
     
+# Fungsi untuk membuat pengguna baru
 def create_user(req):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
+    cursor = connection.cursor(dictionary=True)
     
     try:
         data = validate(CreateUserValidation, req)
@@ -68,7 +77,7 @@ def create_user(req):
         """
 
         cursor.execute(query, (nama, email, password, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha))
-        db_connection.commit()
+        connection.commit()
 
         if cursor.rowcount == 0:
             raise ResponseError(400, "Email or NIK already exists")
@@ -81,11 +90,15 @@ def create_user(req):
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()
 
+# Fungsi untuk mendapatkan berita yang disimpan oleh pengguna berdasarkan ID pengguna
 def get_user_saved_news(id):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
+    cursor = connection.cursor(dictionary=True)
     
     try:
         query = """
@@ -124,18 +137,22 @@ def get_user_saved_news(id):
 
         return payload
     except ResponseError as e:
-        raise e
+        raise e  
     except Exception as e:
         raise ResponseError(500, str(e))
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()
 
+# Fungsi untuk mendapatkan berita beserta komentarnya yang disimpan oleh pengguna berdasarkan ID pengguna
 def get_user_saved_news_comments(id):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
-    
+    cursor = connection.cursor(dictionary=True)
+
     try:
         query = """
             SELECT 
@@ -190,11 +207,15 @@ def get_user_saved_news_comments(id):
     finally:
         if cursor:
             cursor.close()
-    
+        if connection:
+            connection.close()
+
+# Fungsi untuk mendapatkan fasilitas yang didapatkan oleh pengguna berdasarkan ID pengguna
 def get_user_facilities(id):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
+    cursor = connection.cursor(dictionary=True)
     
     try:
         query = """
@@ -289,11 +310,15 @@ def get_user_facilities(id):
     finally:
         if cursor:
             cursor.close()
-    
+        if connection:
+            connection.close()
+
+# Fungsi untuk memperbarui data pengguna
 def update_user(id, req):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
+    cursor = connection.cursor(dictionary=True)
     
     try:
         data = validate(UpdateUserValidation, req)
@@ -308,13 +333,9 @@ def update_user(id, req):
 
         query = f"UPDATE users SET {updates} WHERE id = %s"
         cursor.execute(query, values)
-        db_connection.commit()
-
-        if cursor.rowcount == 0:
-            raise ResponseError(404, "User not found")
+        connection.commit()
 
         return {"affected_rows": cursor.rowcount}
-
     except ResponseError as e:
         raise e
     except Exception as e:
@@ -322,3 +343,5 @@ def update_user(id, req):
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()

@@ -1,7 +1,7 @@
 import assistanceService from "../service/assistance-service.js";
 import { response } from "../response/response.js";
-import { logger } from "../application/logging.js";
 
+// Controller untuk mengambil bantuan berdasarkan ID
 const getAssistanceById = async (req, res, next) => {
   try {
     const result = await assistanceService.getAssistanceById(req.params.id);
@@ -11,6 +11,7 @@ const getAssistanceById = async (req, res, next) => {
   }
 };
 
+// Controller untuk membuat alat bantuan baru
 const createAssistanceTools = async (req, res, next) => {
   try {
     const result = await assistanceService.createAssistanceTools(req.body);

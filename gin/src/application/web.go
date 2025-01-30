@@ -9,6 +9,7 @@ import (
 	"gin-project/src/routes"
 )
 
+// SetupRouter menginisialisasi router dan mengonfigurasi middleware serta routing
 func SetupRouter(db *sql.DB) *gin.Engine {
 	router := gin.Default()
 
@@ -17,6 +18,7 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 
 	routes.PublicRoutes(router, db)
 	routes.PrivateRoutes(router, db)
+
 	router.Use(middleware.ErrorMiddleware())
 
 	return router

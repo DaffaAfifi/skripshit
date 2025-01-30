@@ -11,6 +11,12 @@ import (
 var DB *sql.DB
 
 func InitDB() {
+	// Memuat file .env
+	// envErr := godotenv.Load()
+	// if envErr != nil {
+	// 	panic("Error loading .env file")
+	// }
+
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")

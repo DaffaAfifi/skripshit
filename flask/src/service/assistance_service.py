@@ -1,12 +1,14 @@
 from response.response_error import ResponseError
 from validation.validation import validate
 from validation.assistance_validation import CreateAssistanceToolsValidation
-from application.database import get_cursor, db_connection
+from application.database import get_connection
 
+# Fungsi untuk mendapatkan data tools terkait bantuan berdasarkan ID
 def get_assistance_tools(id):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
+    cursor = connection.cursor(dictionary=True)
     
     try:
         query = """
@@ -56,11 +58,15 @@ def get_assistance_tools(id):
     finally:
         if cursor:
             cursor.close()
-    
+        if connection:
+            connection.close()
+
+# Fungsi untuk membuat data alat yang terkait dengan bantuan
 def create_assistance_tools(req):
-    cursor = get_cursor()
-    if cursor is None:
+    connection = get_connection()
+    if connection is None:
         raise ResponseError(500, "Error obtaining database connection")
+    cursor = connection.cursor(dictionary=True)
     
     try:
         data = validate(CreateAssistanceToolsValidation, req)
@@ -75,7 +81,7 @@ def create_assistance_tools(req):
         """
 
         cursor.execute(query, (assistance_id, tools_id, kuantitas))
-        db_connection.commit()
+        connection.commit()
 
         return "oke"
     except ResponseError as e:
@@ -85,3 +91,5 @@ def create_assistance_tools(req):
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()

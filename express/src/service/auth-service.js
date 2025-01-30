@@ -5,9 +5,8 @@ import bcrypt from "bcrypt";
 import { ResponseError } from "../response/response-error.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-import { logger } from "../application/logging.js";
 
-// Login user
+// Fungsi untuk login pengguna
 const login = async (req) => {
   const connection = await db.promise().getConnection();
   try {
@@ -50,7 +49,7 @@ const login = async (req) => {
   }
 };
 
-// Logout user
+// Fungsi untuk logout pengguna
 const logout = async (token) => {
   const connection = await db.promise().getConnection();
   try {

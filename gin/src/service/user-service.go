@@ -11,9 +11,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GetUsers(db *sql.DB) ([]model.User, error) {
+// GetUsers mengambil semua pengguna dari database
+func GetUsers(db *sql.DB, page int, limit int) ([]model.User, error) {
 	var users []model.User
-	query := "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users"
+	offset := (page - 1) * limit
+	query := "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users LIMIT ? OFFSET ?"
 
 	stmt, err := db.Prepare(query)
 	if err != nil {
@@ -21,7 +23,7 @@ func GetUsers(db *sql.DB) ([]model.User, error) {
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query()
+	rows, err := stmt.Query(limit, offset)
 	if err != nil {
 		return users, response.NewResponseError(400, err.Error())
 	}
@@ -38,6 +40,7 @@ func GetUsers(db *sql.DB) ([]model.User, error) {
 	return users, nil
 }
 
+// GetUserById mengambil data pengguna berdasarkan id
 func GetUserById(id string, db *sql.DB) (model.User, error) {
 	var user model.User
 	query := "SELECT nama, email, NIK, alamat, telepon, jenis_kelamin, kepala_keluarga, tempat_lahir, tanggal_lahir, jenis_usaha FROM users WHERE id = ?"
@@ -59,6 +62,7 @@ func GetUserById(id string, db *sql.DB) (model.User, error) {
 	return user, nil
 }
 
+// CreateUser membuat pengguna baru di database
 func CreateUser(request model.CreateUserRequest, db *sql.DB) error {
 	newPassword, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 
@@ -111,7 +115,7 @@ func UpdateUser(id string, request model.UpdateUserRequest, db *sql.DB) error {
 	}
 
 	if len(updates) == 0 {
-		return response.NewResponseError(400, "Invalid request format")
+		return response.NewResponseError(400, "No valid fields to update")
 	}
 
 	query := fmt.Sprintf("UPDATE users SET %s WHERE id = ?", strings.Join(updates, ", "))
@@ -119,31 +123,24 @@ func UpdateUser(id string, request model.UpdateUserRequest, db *sql.DB) error {
 
 	stmt, err := db.Prepare(query)
 	if err != nil {
-		return response.NewResponseError(500, "Failed to prepare statement")
+		return response.NewResponseError(500, "Failed to prepare statement: "+err.Error())
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(values...)
+	_, err = stmt.Exec(values...)
 	if err != nil {
-		return response.NewResponseError(400, err.Error())
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return response.NewResponseError(500, err.Error())
-	}
-
-	if rowsAffected == 0 {
-		return response.NewResponseError(404, "User not found")
+		return response.NewResponseError(400, "Failed to execute update query: "+err.Error())
 	}
 
 	return nil
 }
 
+// isZero memeriksa apakah nilai dari field adalah nilai default (kosong)
 func isZero(value interface{}) bool {
 	return reflect.DeepEqual(value, reflect.Zero(reflect.TypeOf(value)).Interface())
 }
 
+// GetSavedNews mengambil berita yang disimpan oleh pengguna berdasarkan id pengguna
 func GetSavedNews(id string, db *sql.DB) (model.UserSavedNews, error) {
 	var userSavedNews model.UserSavedNews
 	var newsList []model.News
@@ -183,6 +180,7 @@ func GetSavedNews(id string, db *sql.DB) (model.UserSavedNews, error) {
 	return userSavedNews, nil
 }
 
+// GetUserSavedNewsComment mengambil berita yang disimpan dan komentar terkait untuk pengguna dari database.
 func GetUserSavedNewsComment(id string, db *sql.DB) (model.UserSavedNewsComment, error) {
 	var userSavedNewsComment model.UserSavedNewsComment
 	var newsCommentsMap = make(map[string]*model.NewsComments)
@@ -242,6 +240,7 @@ func GetUserSavedNewsComment(id string, db *sql.DB) (model.UserSavedNewsComment,
 	return userSavedNewsComment, nil
 }
 
+// GetUserFacilities mengambil fasilitas pengguna (sertifikat, pelatihan, bantuan, alat) dari database.
 func GetUserFacilities(id string, db *sql.DB) (model.UserFacilities, error) {
 	var userFacilities model.UserFacilities
 	helpMap := make(map[string]*model.Bantuan)

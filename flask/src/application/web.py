@@ -4,12 +4,10 @@ from response.response_error import ResponseError
 from route.api import router
 from route.public_api import public_router
 
+# Fungsi untuk membuat dan mengonfigurasi aplikasi Flask
 def create_app():
     app = Flask(__name__)
-
     app.register_blueprint(public_router, url_prefix='/api')
     app.register_blueprint(router, url_prefix='/api')
-
     app.register_error_handler(ResponseError, error_middleware)
-
     return app

@@ -3,6 +3,7 @@ import { ResponseError } from "../response/response-error.js";
 import "dotenv/config";
 import { logger } from "../application/logging.js";
 
+// Fungsi untuk mendapatkan berita beserta komentar berdasarkan ID berita
 const getNewsCommentsById = async (id) => {
   const connection = await db.promise().getConnection();
   try {

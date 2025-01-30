@@ -6,6 +6,7 @@ import (
 	"gin-project/src/response"
 )
 
+// GetAssistanceTools mengambil data bantuan beserta alat yang terkait berdasarkan ID bantuan
 func GetAssistanceTools(id string, db *sql.DB) (model.Bantuan, error) {
 	var bantuan model.Bantuan
 
@@ -58,6 +59,7 @@ func GetAssistanceTools(id string, db *sql.DB) (model.Bantuan, error) {
 	return bantuan, nil
 }
 
+// CreateAssistanceTools untuk membuat relasi antara bantuan dan alat dalam database
 func CreateAssistanceTools(request model.CreateAssistanceToolsRequest, db *sql.DB) error {
 	query := `INSERT INTO assistance_tools (assistance_id, tools_id, kuantitas) VALUES (?, ?, ?)`
 	stmt, err := db.Prepare(query)

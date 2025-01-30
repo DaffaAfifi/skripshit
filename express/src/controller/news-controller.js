@@ -1,8 +1,7 @@
 import newsService from "../service/news-service.js";
 import { response } from "../response/response.js";
-import { logger } from "../application/logging.js";
 
-// Get news comment by id
+// Controller untuk mendapatkan komentar berita berdasarkan ID
 const getNewsCommentsById = async (req, res, next) => {
   try {
     const result = await newsService.getNewsCommentsById(req.params.id);
@@ -12,6 +11,7 @@ const getNewsCommentsById = async (req, res, next) => {
   }
 };
 
+// Controller untuk test, hanya mengembalikan data statis
 const test = async (req, res, next) => {
   try {
     res.status(200).json({

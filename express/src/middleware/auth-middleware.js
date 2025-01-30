@@ -2,6 +2,7 @@ import db from "../application/database.js";
 import { ResponseError } from "../response/response-error.js";
 import jwt from "jsonwebtoken";
 
+// Middleware untuk memeriksa autentikasi menggunakan token JWT
 export const authMiddleware = async (req, res, next) => {
   const token = req.get("Authorization");
 
